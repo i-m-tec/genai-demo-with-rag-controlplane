@@ -1,7 +1,7 @@
 # genai-demo-with-rag-controlplane
 GenAI demo with RAG in multi-cloud ControlPlane.com using a datacamp tutorial.  
 ## YouTube Demo
-[![Gen AI with RAG Demo in Multi-Cloud ControlPlane.com](img.youtube.com/FQt8XTwCS-o/maxresdefault.jpg)](https://www.youtube.com/watch?v=FQt8XTwCS-o)
+[![Gen AI with RAG Demo in Multi-Cloud ControlPlane.com](img.youtube.com/FQt8XTwCS-o/0.jpg)](https://www.youtube.com/watch?v=FQt8XTwCS-o)
 ## Local AI with Docker, n8n, Qdrant, and Ollama
 Follow along in docker with your local machine  
 https://app.datacamp.com/learn/tutorials/local-ai
@@ -11,9 +11,7 @@ Multi-cloud internal deveoloper platform.
 https://controlplane.com/pricing  
 https://docs.controlplane.com/quickstart/quick-start-3-cli  
 ### Easily deploy Deepseek-r1 on AWS using Control Plane
-https://youtu.be/gLoDcFXS5TM?si=FPlnimRcOJg8XGon
-
-[![Easily deploy Deepseek-r1 on AWS using Control Plane](img.youtube.com/gLoDcFXS5TM/maxresdefault.jpg)](https://www.youtube.com/watch?v=gLoDcFXS5TM)
+[![Easily deploy Deepseek-r1 on AWS using Control Plane](img.youtube.com/gLoDcFXS5TM/0.jpg)](https://www.youtube.com/watch?v=gLoDcFXS5TM)
 
 ## InertiaLabs
 https://www.inertialabs.io/
