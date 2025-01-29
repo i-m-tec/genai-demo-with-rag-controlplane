@@ -1,0 +1,127 @@
+kind: volumeset
+name: demo-n8n-data
+description: demo-n8n-data
+spec:
+  fileSystemType: ext4
+  initialCapacity: 10
+  performanceClass: general-purpose-ssd
+---
+kind: volumeset
+name: demo-ollama-data
+description: demo-ollama-data
+spec:
+  fileSystemType: ext4
+  initialCapacity: 100
+  performanceClass: general-purpose-ssd
+---
+kind: volumeset
+name: demo-qdrant-data
+description: demo-qdrant-data
+spec:
+  fileSystemType: ext4
+  initialCapacity: 10
+  performanceClass: general-purpose-ssd
+---
+kind: workload
+name: demo-n8n
+description: n8n for demo
+spec:
+  type: stateful
+  securityOptions:
+    filesystemGroupId: 1000
+  containers:
+    - name: n8n
+      cpu: 400m
+      memory: 512Mi
+      env:
+        - name: N8N_HOST
+          value: http://localhost
+        - name: WEBHOOK_URL
+          value: http://localhost
+      ports:
+        - number: 5678
+      image: 'n8nio/n8n:latest'
+      volumes:
+        - path: /home/node/.n8n
+          uri: 'cpln://volumeset/demo-n8n-data'
+          recoveryPolicy: retain
+        - path: /data/shared
+          uri: 'cpln://volumeset/demo-n8n-data'
+          recoveryPolicy: retain
+        - path: /backup
+          uri: 'cpln://volumeset/demo-n8n-data'
+          recoveryPolicy: retain
+  defaultOptions:
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []
+---
+kind: workload
+name: demo-qdrant
+description: qdrant for demo
+spec:
+  type: stateful
+  containers:
+    - name: qdrant
+      cpu: 150m
+      memory: 256Mi
+      ports:
+        - number: 6333
+      image: qdrant/qdrant
+      volumes:
+        - path: /qdrant/storage
+          uri: 'cpln://volumeset/demo-qdrant-data'
+          recoveryPolicy: retain
+  defaultOptions:
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []
+---
+kind: workload
+name: demo-ollama
+description: ollama gpu
+spec:
+  type: stateful
+  containers:
+    - name: ollama
+      image: 'ollama/ollama:latest'
+      cpu: 6000m
+      memory: 7Gi
+      gpu:
+        nvidia:
+          model: t4
+          quantity: 1
+      ports:
+        - number: 11434
+      volumes:
+        - path: /root/.ollama
+          uri: 'cpln://volumeset/demo-ollama-data'
+          recoveryPolicy: retain
+      env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: '0'
+  defaultOptions:
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []

@@ -1,0 +1,42 @@
+kind: volumeset
+name: ollama-storage
+description: ollama-storage
+spec:
+  fileSystemType: ext4
+  initialCapacity: 100
+  performanceClass: general-purpose-ssd
+---
+kind: workload
+name: ollama-gpu
+description: ollama-gpu
+spec:
+  type: stateful
+  containers:
+    - name: ollama
+      image: 'ollama/ollama:latest'
+      cpu: 6000m
+      memory: 7Gi
+      gpu:
+        nvidia:
+          model: t4
+          quantity: 1
+      ports:
+        - number: 11434
+      volumes:
+        - path: /root/.ollama
+          uri: 'cpln://volumeset/ollama-storage'
+          recoveryPolicy: retain
+      env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: '0'
+  defaultOptions:
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []

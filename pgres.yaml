@@ -1,0 +1,68 @@
+kind: volumeset
+name: postgres-storage
+description: postgres-storage
+spec:
+  fileSystemType: ext4
+  initialCapacity: 10
+  performanceClass: general-purpose-ssd
+---
+kind: workload
+name: postgres
+description: postgres db for genai demo
+spec:
+  type: stateful
+  containers:
+    - name: postgres
+      image: 'postgres:16-alpine'
+      cpu: 150m
+      memory: 256Mi
+      env:
+        - name: POSTGRES_USER
+          value: 'root'
+        - name: POSTGRES_PASSWORD
+          value: 'password'
+        - name: POSTGRES_DB
+          value: 'n8n'
+        - name: PGDATA
+          value: /var/lib/postgresql/data
+      volumes:
+        - path: /var/lib/postgresql
+          uri: 'cpln://volumeset/postgres-storage'
+          recoveryPolicy: retain
+      ports:
+        - number: 5432
+          protocol: tcp
+      readinessProbe:
+        exec:
+          command:
+            - /bin/sh
+            - '-c'
+            - 'pg_isready -h localhost -U root -d n8n'
+        failureThreshold: 10
+        periodSeconds: 5
+        timeoutSeconds: 5
+  defaultOptions:
+    autoscaling:
+      maxConcurrency: 0
+      maxScale: 1
+      metric: disabled
+      minScale: 1
+      scaleToZeroDelay: 300
+      target: 100
+    capacityAI: false
+    debug: false
+    suspend: false
+    timeoutSeconds: 5
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      inboundBlockedCIDR: []
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowHostname: []
+      outboundAllowPort: []
+      outboundBlockedCIDR: []
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []

@@ -1,0 +1,72 @@
+kind: volumeset
+name: n8n-storage
+description: n8n-storage
+spec:
+  fileSystemType: ext4
+  initialCapacity: 10
+  performanceClass: general-purpose-ssd
+---  
+kind: workload
+name: n8n
+description: n8n
+spec:
+  type: stateful
+  securityOptions:
+    filesystemGroupId: 1000
+  containers:
+    - name: n8n
+      image: 'n8nio/n8n:1.73.1'
+      cpu: 400m
+      memory: 1024Mi
+      env:
+        - name: N8N_HOST
+          value: https://n8n-389m430bc8k0g.cpln.app
+        - name: WEBHOOK_URL
+          value: https://n8n-389m430bc8k0g.cpln.app
+        - name: N8N_PROTOCOL
+          value: https
+        - name: VUE_APP_URL_BASE_API
+          value: https://n8n-389m430bc8k0g.cpln.app
+        - name: DB_TYPE
+          value: postgresdb
+        - name: DB_POSTGRESDB_HOST
+          value: postgres.demo.cpln.local
+        - name: DB_POSTGRESDB_USER
+          value: 'root'
+        - name: DB_POSTGRESDB_DB
+          value: 'n8n'
+        - name: DB_POSTGRESDB_PASSWORD
+          value: 'password'
+        - name: N8N_DIAGNOSTICS_ENABLED
+          value: 'false'
+        - name: N8N_PERSONALIZATION_ENABLED
+          value: 'false'
+        - name: N8N_ENCRYPTION_KEY
+          value: 'super-secret-key'
+        - name: N8N_USER_MANAGEMENT_JWT_SECRET
+          value: 'even-more-secret'
+        - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+          value: 'false'
+      ports:
+        - number: 5678
+      volumes:
+        - path: /home/node/.n8n
+          uri: 'cpln://volumeset/n8n-storage'
+          recoveryPolicy: retain
+        - path: /data/shared
+          uri: 'cpln://volumeset/n8n-storage'
+          recoveryPolicy: retain
+        - path: /backup
+          uri: 'cpln://volumeset/n8n-storage'
+          recoveryPolicy: retain
+  defaultOptions:
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
+      inboundAllowWorkload: []
