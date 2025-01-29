@@ -7,7 +7,7 @@ spec:
   performanceClass: general-purpose-ssd
 ---
 kind: workload
-name: ollama-gpu
+name: demo-ollama
 description: ollama-gpu
 spec:
   type: stateful
